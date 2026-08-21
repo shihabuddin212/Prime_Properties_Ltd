@@ -1,0 +1,157 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Property {
+  id             String   @id @default(uuid())
+  title          String
+  slug           String   @unique
+  description    String
+  location       String   // e.g. Gulshan, Dhanmondi, Lalbagh
+  type           String   // e.g. Apartment, Commercial, Land
+  status         String   // e.g. Ongoing, Upcoming, Ready, Landowner JV
+  price          String   // e.g. "Price on Request" or numerical text "2.5 Crore"
+  sqft           Int      // size in square feet
+  beds           Int      // bedrooms
+  baths          Int      // bathrooms
+  land           String   // e.g. "8.5 Katha"
+  videoUrl       String?  // autoplay hero / detail video
+  images         String   // Comma-separated list of image URLs/paths or Base64
+  floorPlans     String?  // Comma-separated list of floor plan image URLs/paths or Base64
+  amenities      String   // Comma-separated list of amenities
+  isFeatured     Boolean  @default(false)
+  isSpecialOffer Boolean  @default(false)
+  published      Boolean  @default(true)
+  
+  // High-fidelity detail attributes from mockup
+  address        String?  // e.g. "Plot - 52, Road - 7A, Dhanmondi"
+  floors         String?  // e.g. "B+G+11"
+  unitsPerFloor  String?  // e.g. "1"
+  launchDate     String?  // e.g. "June 2022"
+  completionDate String?  // e.g. "July 2026"
+  brochureUrl    String?  // Link to PDF brochure file
+  mapUrl         String?  // Iframe source query or URL for Google Maps
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Lead {
+  id            String   @id @default(uuid())
+  name          String
+  phone         String
+  email         String
+  message       String?
+  visitDate     String?  // Preferred date for site visit
+  propertyId    String?
+  propertyTitle String?
+  status        String   @default("New") // e.g. New, Contacted, Closed
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ChatbotFAQ {
+  id        String   @id @default(uuid())
+  trigger   String   @unique // Trigger keyword or phrase is checked case-insensitively
+  response  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  sessionId String   // Link messages in a conversation session context
+  sender    String   // "user" or "bot" or "admin"
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model SpecialOffer {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String
+  location  String
+  sizeRange String
+  beds      String
+  baths     String
+  land      String
+  image     String   // text/base64 or URL
+  logoBadge String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GalleryAlbum {
+  id        String   @id @default(uuid())
+  title     String
+  category  String   // "customer-events" | "corporate-events" | "social"
+  images    String   // Pipe-separated image URLs/base64, first image is the cover
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ConstructionProject {
+  id                     String         @id @default(uuid())
+  title                  String
+  slug                   String         @unique
+  location               String?
+  expectedCompletionDate String?
+  statusUpdateDate       String?
+  featuredImage          String?        // Image URL / base64 string
+  logoUrl                String?        // Optional logo URL
+  published              Boolean        @default(true)
+  progressItems          ProgressItem[]
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+}
+
+model ProgressItem {
+  id              String              @id @default(uuid())
+  projectId       String
+  project         ConstructionProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  slNo            String
+  workName        String
+  progressDetails String
+  sortOrder       Int                 @default(0)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  image     String
+  name      String
+  role      String
+  quote     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  isRead    Boolean  @default(false)
+  type      String   @default("Contact") // "Contact" or "Newsletter"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
